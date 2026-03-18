@@ -1,2 +1,8 @@
 
-@theme "/usr/share/rofi/themes/DarkBlue.rasi"
+@theme "/home/asi/.config/rofi/themes/darkblue-games.rasi"
+
+configuration {
+    plugin-path: "/usr/lib/rofi/";
+    modes:       "drun,games";
+    show:        "drun";
+}

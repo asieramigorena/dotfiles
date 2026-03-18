@@ -1,0 +1,24 @@
+@theme "/usr/share/rofi/themes/DarkBlue.rasi"
+
+configuration {
+    show-icons: true;
+}
+
+element {
+    children: [ element-icon, element-text ];
+    padding:  2px;
+    orientation: horizontal;
+}
+
+element-icon {
+    size:    24px;
+    padding: 0px 6px 0px 0px;
+    cursor:  inherit;
+}
+
+element-text {
+    background-color: inherit;
+    text-color:       inherit;
+    cursor:           inherit;
+    vertical-align:   0.5;
+}
