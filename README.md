@@ -1,11 +1,17 @@
 # dotfiles
 
 Personal Manjaro Linux environment backup. Built around **i3**, **polybar**, **kitty**, and **zsh**.
-Run `install.sh` on a fresh machine and everything symlinks into place automatically.
+
+Two installers are available depending on your use case:
+
+| Script | Use case | Works on |
+|---|---|---|
+| `install.sh` | Full environment (i3, polybar, kitty, rofi, …) | Arch / Manjaro |
+| `install-terminal.sh` | Terminal only (zsh, oh-my-zsh, powerlevel10k) | Debian / Ubuntu / Arch / Manjaro |
 
 ---
 
-## Quick install
+## Full install (Arch / Manjaro)
 
 ```bash
 git clone <your-remote-url> ~/.dotfiles
@@ -17,6 +23,26 @@ The script will:
 1. Symlink every tracked file to its correct location in `$HOME` (existing files are backed up as `.bak`)
 2. Install **oh-my-zsh** if not present
 3. Clone the required zsh plugins and theme
+
+---
+
+## Terminal-only install (any distro)
+
+Use this when you just want your shell to feel like home — no X11 or desktop environment required. Works on Debian/Ubuntu and Arch/Manjaro.
+
+```bash
+git clone <your-remote-url> ~/.dotfiles
+cd ~/.dotfiles
+bash install-terminal.sh
+```
+
+The script will:
+1. Install `zsh`, `git`, and `curl` via the system package manager (`apt` or `pacman`)
+2. Install **oh-my-zsh**, **powerlevel10k**, **zsh-autosuggestions**, and **zsh-autocomplete**
+3. Symlink `.zshrc`, `.bashrc`, `.bash_profile`, `.p10k.zsh`, `.dir_colors`, and `.nanorc`
+4. Set zsh as the default shell
+
+Log out and back in (or run `exec zsh`) after it finishes.
 
 ---
 
