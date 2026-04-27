@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/asieramigorena/dotfiles/main/install-terminal.sh | bash
 set -e
 
-DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOME_DIR="$HOME"
+RAW="https://raw.githubusercontent.com/asieramigorena/dotfiles/main"
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -13,21 +14,17 @@ info()  { echo -e "${GREEN}[+]${NC} $1"; }
 warn()  { echo -e "${YELLOW}[!]${NC} $1"; }
 error() { echo -e "${RED}[x]${NC} $1"; }
 
-link() {
-    local src="$1"
-    local dst="$2"
-    local dir
-    dir="$(dirname "$dst")"
-
-    mkdir -p "$dir"
+fetch() {
+    local file="$1"
+    local dst="$HOME_DIR/$file"
 
     if [ -e "$dst" ] && [ ! -L "$dst" ]; then
         warn "Backing up existing $dst → ${dst}.bak"
         mv "$dst" "${dst}.bak"
     fi
 
-    ln -sf "$src" "$dst"
-    info "Linked $dst"
+    curl -fsSL "$RAW/$file" -o "$dst"
+    info "Installed $dst"
 }
 
 # ── Distro detection ──────────────────────────────────────────────────────────
@@ -75,12 +72,12 @@ if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autocomplete" ]; then
 fi
 
 # ── Dotfiles ──────────────────────────────────────────────────────────────────
-link "$DOTFILES/.zshrc"        "$HOME_DIR/.zshrc"
-link "$DOTFILES/.bashrc"       "$HOME_DIR/.bashrc"
-link "$DOTFILES/.bash_profile" "$HOME_DIR/.bash_profile"
-link "$DOTFILES/.p10k.zsh"     "$HOME_DIR/.p10k.zsh"
-link "$DOTFILES/.dir_colors"   "$HOME_DIR/.dir_colors"
-link "$DOTFILES/.nanorc"       "$HOME_DIR/.nanorc"
+fetch .zshrc
+fetch .bashrc
+fetch .bash_profile
+fetch .p10k.zsh
+fetch .dir_colors
+fetch .nanorc
 
 # ── Default shell ─────────────────────────────────────────────────────────────
 ZSH_BIN="$(which zsh)"

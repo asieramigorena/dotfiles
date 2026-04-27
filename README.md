@@ -28,18 +28,16 @@ The script will:
 
 ## Terminal-only install (any distro)
 
-Use this when you just want your shell to feel like home — no X11 or desktop environment required. Works on Debian/Ubuntu and Arch/Manjaro.
+Use this when you just want your shell to feel like home — no X11 or desktop environment required. Works on Debian/Ubuntu and Arch/Manjaro. No clone needed; the script fetches only the files it needs.
 
 ```bash
-git clone <your-remote-url> ~/.dotfiles
-cd ~/.dotfiles
-bash install-terminal.sh
+curl -fsSL https://raw.githubusercontent.com/asieramigorena/dotfiles/main/install-terminal.sh | bash
 ```
 
 The script will:
 1. Install `zsh`, `git`, and `curl` via the system package manager (`apt` or `pacman`)
 2. Install **oh-my-zsh**, **powerlevel10k**, **zsh-autosuggestions**, and **zsh-autocomplete**
-3. Symlink `.zshrc`, `.bashrc`, `.bash_profile`, `.p10k.zsh`, `.dir_colors`, and `.nanorc`
+3. Download `.zshrc`, `.bashrc`, `.bash_profile`, `.p10k.zsh`, `.dir_colors`, and `.nanorc` directly into `$HOME`
 4. Set zsh as the default shell
 
 Log out and back in (or run `exec zsh`) after it finishes.
