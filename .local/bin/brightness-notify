@@ -1,0 +1,14 @@
+#!/bin/bash
+export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
+BACKLIGHT=/sys/class/backlight/intel_backlight
+
+sudo /home/asi/.local/bin/brightness "$1"
+
+MAX=$(cat "$BACKLIGHT/max_brightness")
+CURRENT=$(cat "$BACKLIGHT/brightness")
+PERCENT=$(( CURRENT * 100 / MAX ))
+
+dunstify -a "brightness" -u low -t 1500 \
+    -h string:x-dunst-stack-tag:brightness \
+    -h int:value:"$PERCENT" \
+    " Brightness" "$PERCENT%"

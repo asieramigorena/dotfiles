@@ -46,6 +46,10 @@ link "$DOTFILES/.xinitrc"       "$HOME_DIR/.xinitrc"
 link "$DOTFILES/.Xresources"    "$HOME_DIR/.Xresources"
 link "$DOTFILES/.Xclients"      "$HOME_DIR/.Xclients"
 
+# ── .local/bin ────────────────────────────────────────────────────────────────
+link "$DOTFILES/.local/bin/brightness"         "$HOME_DIR/.local/bin/brightness"
+link "$DOTFILES/.local/bin/brightness-notify"  "$HOME_DIR/.local/bin/brightness-notify"
+
 # ── .config ───────────────────────────────────────────────────────────────────
 link "$DOTFILES/.config/i3/config"                  "$HOME_DIR/.config/i3/config"
 link "$DOTFILES/.config/kitty/kitty.conf"            "$HOME_DIR/.config/kitty/kitty.conf"

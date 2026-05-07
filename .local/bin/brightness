@@ -1,0 +1,22 @@
+#!/bin/bash
+BACKLIGHT=/sys/class/backlight/intel_backlight
+MAX=$(cat "$BACKLIGHT/max_brightness")
+CURRENT=$(cat "$BACKLIGHT/brightness")
+STEP=$((MAX / 10))
+
+case "$1" in
+    up)
+        NEW=$((CURRENT + STEP))
+        [ "$NEW" -gt "$MAX" ] && NEW=$MAX
+        ;;
+    down)
+        NEW=$((CURRENT - STEP))
+        [ "$NEW" -lt 100 ] && NEW=100
+        ;;
+    *)
+        echo "Usage: $0 up|down"
+        exit 1
+        ;;
+esac
+
+echo "$NEW" > "$BACKLIGHT/brightness"
