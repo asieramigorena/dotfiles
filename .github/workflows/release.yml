@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: latest
+        run: |
+          git fetch --tags
+          TAG=$(git tag -l "v*" | sort -V | tail -1)
+          echo "tag=${TAG:-v0.0.0}" >> $GITHUB_OUTPUT
+
+      - name: Compute next patch version
+        id: next
+        run: |
+          V=${{ steps.latest.outputs.tag }}
+          V=${V#v}
+          MAJOR=${V%%.*}; V=${V#*.}
+          MINOR=${V%%.*}; PATCH=${V#*.}
+          echo "tag=v${MAJOR}.${MINOR}.$((PATCH + 1))" >> $GITHUB_OUTPUT
+
+      - name: Build changelog
+        id: changelog
+        run: |
+          SINCE=${{ steps.latest.outputs.tag }}
+          NOTES=$(git log ${SINCE}..HEAD --pretty=format:"- %s" --no-merges)
+          {
+            echo "notes<<EOF"
+            echo "$NOTES"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Tag and release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=${{ steps.next.outputs.tag }}
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes "${{ steps.changelog.outputs.notes }}"
