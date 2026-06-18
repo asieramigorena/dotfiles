@@ -45,7 +45,7 @@ build_menu() {
         else
             echo "󰂴  $name  ::$mac"
         fi
-    done < <(bluetoothctl devices Paired)
+    done < <(bluetoothctl devices)
 
     echo "---"
     echo "󱇧  Abrir Overskride"
@@ -75,7 +75,7 @@ case "$CHOICE" in
     *)
         mac=$(echo "$CHOICE" | grep -oP '(?<=::)[0-9A-F:]+')
         if [ -n "$mac" ]; then
-            if bluetoothctl info "$mac" | grep -q "Paired: yes"; then
+            if bluetoothctl info "$mac" | grep -qE "Paired: yes|Trusted: yes"; then
                 connect_device "$mac"
             else
                 pair_device "$mac"
