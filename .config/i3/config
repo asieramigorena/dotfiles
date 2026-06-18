@@ -227,5 +227,6 @@ bindsym $mod+Shift+p exec systemctl poweroff
 bindsym $mod+Shift+o exec systemctl reboot
 
 bindsym $mod+Shift+s exec --no-startup-id flameshot gui
+bindsym $mod+b exec --no-startup-id ~/.local/bin/rofi-bluetooth
 
 bindsym $mod+m exec chromium --app=https://music.apple.com/

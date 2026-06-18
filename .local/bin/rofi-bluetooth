@@ -1,0 +1,79 @@
+#!/bin/bash
+# Rofi bluetooth menu — toggle, connect/disconnect paired devices, open managers.
+
+BT_ON=$(bluetoothctl show | grep -q "Powered: yes" && echo true || echo false)
+
+toggle_bt() {
+    if $BT_ON; then
+        bluetoothctl power off
+    else
+        bluetoothctl power on
+    fi
+}
+
+connect_device() {
+    local mac="$1"
+    local connected
+    connected=$(bluetoothctl info "$mac" | grep -q "Connected: yes" && echo true || echo false)
+    if $connected; then
+        bluetoothctl disconnect "$mac"
+    else
+        bluetoothctl connect "$mac"
+    fi
+}
+
+build_menu() {
+    if $BT_ON; then
+        echo "󰂯  Bluetooth: ON  →  apagar"
+    else
+        echo "󰂲  Bluetooth: OFF  →  encender"
+        return
+    fi
+
+    echo "---"
+
+    while IFS= read -r line; do
+        local mac name connected icon
+        mac=$(echo "$line" | awk '{print $2}')
+        name=$(echo "$line" | cut -d' ' -f3-)
+        connected=$(bluetoothctl info "$mac" | grep -q "Connected: yes" && echo true || echo false)
+        if $connected; then
+            icon="󰂱"
+            echo "$icon  $name  [conectado]  ::$mac"
+        else
+            icon="󰂴"
+            echo "$icon  $name  ::$mac"
+        fi
+    done < <(bluetoothctl devices Paired)
+
+    echo "---"
+    echo "󱇧  Abrir Overskride"
+    echo "   Abrir bluetui"
+    echo "󰂰  Buscar nuevos dispositivos"
+}
+
+# Show menu
+CHOICE=$(build_menu | grep -v "^---$" | rofi -dmenu -p "Bluetooth" -i \
+    -theme-str 'window {width: 400px;}' \
+    -theme-str 'listview {lines: 8;}')
+
+[ -z "$CHOICE" ] && exit 0
+
+case "$CHOICE" in
+    *"Bluetooth: ON"*)
+        toggle_bt ;;
+    *"Bluetooth: OFF"*)
+        toggle_bt ;;
+    *"Abrir Overskride"*)
+        overskride & ;;
+    *"Abrir bluetui"*)
+        kitty --class float-terminal -e bluetui & ;;
+    *"Buscar nuevos"*)
+        kitty --class float-terminal -e bash -c "bluetoothctl scan on; exec bash" & ;;
+    *"::*"*)
+        mac=$(echo "$CHOICE" | grep -oP '(?<=::)[0-9A-F:]+')
+        [ -n "$mac" ] && connect_device "$mac" ;;
+    *)
+        mac=$(echo "$CHOICE" | grep -oP '[0-9A-F]{2}(:[0-9A-F]{2}){5}')
+        [ -n "$mac" ] && connect_device "$mac" ;;
+esac
