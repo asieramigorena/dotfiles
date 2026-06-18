@@ -79,6 +79,8 @@ Config: `.zshrc`, `.p10k.zsh`
 | `Super+Shift+O` | Reboot |
 | `Super+Shift+S` | Screenshot (flameshot GUI) |
 | `Super+M` | Apple Music (Chromium app mode) |
+| `Super+P` | Display profile switcher (rofi → autorandr) |
+| `Super+B` | Bluetooth menu (rofi-bluetooth) |
 | `Super+R` | Enter resize mode |
 | `Super+Shift+C` | Reload i3 config |
 | `Super+Shift+R` | Restart i3 in-place |
@@ -96,10 +98,10 @@ Config: `.config/i3/config`
 
 ### Status bar — polybar
 
-Dark bar (#282A2E) with rounded corners, sitting at the top of the screen.
+Dark bar (#282A2E) with rounded corners, sitting at the top of the screen. In dual-monitor mode (`solo` profile) a second bar appears on the external monitor.
 
 ```
-[workspaces] [keyboard] [🎵 song] [window title]  |  date & time  |  VOL  RAM  CPU  wifi  battery
+[workspaces] [keyboard] [🎵 song] [window title]  |  date & time  |  BT  VOL  RAM  CPU  wifi  battery
 ```
 
 | Module | What it shows |
@@ -109,13 +111,16 @@ Dark bar (#282A2E) with rounded corners, sitting at the top of the screen.
 | `music` | Currently playing track (custom script polling MPRIS) |
 | `xwindow` | Focused window title, truncated at 60 chars |
 | `date` | `DD/MM/YYYY \| HH:MM:SS` |
+| `bluetooth` | BT on/off + connected device count; click opens rofi-bluetooth |
 | `pulseaudio` | Volume % or "muted" |
 | `memory` | RAM % used |
 | `cpu` | CPU % used, refreshed every 2 s |
 | `wlan` | Interface name + SSID + local IP |
 | `battery` | BAT1 level; low-at 20%, full-at 99% |
 
-Config: `.config/polybar/config.ini`, `.config/polybar/music.sh`, `.config/polybar/cava.sh`
+The bar is launched by `launch.sh`, which detects active monitors via xrandr and starts the correct bar(s) for the current display profile.
+
+Config: `.config/polybar/config.ini`, `.config/polybar/launch.sh`, `.config/polybar/bluetooth.sh`, `.config/polybar/music.sh`
 
 ---
 
@@ -165,15 +170,35 @@ Config: `.config/dunst/dunstrc`
 
 ### Display management — autorandr
 
-Three saved profiles, applied automatically on startup and on hotplug via `exec_always --no-startup-id autorandr --change`.
+Three saved profiles, applied automatically on startup and on hotplug (udev rule in `/etc/udev/rules.d/95-monitor-hotplug.rules`).
 
-| Profile | Description |
-|---|---|
-| `solo` | Laptop screen only |
-| `externo` | External monitor only |
-| `duplicado` | Both screens mirrored |
+| Profile | Description | Resolution |
+|---|---|---|
+| `solo` | Laptop (primary) + external side by side | eDP-1 1920×1200 + DP-1 2560×1440 |
+| `externo` | External monitor only, laptop screen off | DP-1 2560×1440 @ 60 Hz |
+| `duplicado` | Both screens mirrored | eDP-1 1920×1200 |
+
+After every profile switch the global `postswitch` hook restarts polybar (via `launch.sh`) and reloads nitrogen, both when triggered by the user and when triggered by udev as root.
+
+`Super+P` opens a rofi menu to switch profiles manually.
 
 Config: `.config/autorandr/`
+
+---
+
+### Bluetooth — rofi-bluetooth
+
+Rofi-based bluetooth menu with no extra GUI needed day-to-day.
+
+| Action | How |
+|---|---|
+| Open menu | `Super+B` or click `BT` in polybar |
+| Connect / disconnect | Select device from the list |
+| Toggle bluetooth on/off | First option in the menu |
+| Scan for new devices | Last option — runs 8 s scan, reopens menu |
+| Full GUI (Overskride) | Option in the menu |
+
+Script: `.local/bin/rofi-bluetooth`
 
 ---
 
@@ -216,7 +241,7 @@ The default Manjaro i3 community edition comes with a heavily modified config. H
 |---|---|---|
 | **Terminal** | `$TERMINAL` (usually urxvt/xterm) | `kitty` |
 | **Launcher** | `dmenu_recency` + `morc_menu` | `rofi` (drun + games) |
-| **Window borders** | 1px pixel borders | Borderless (`border pixel 0`) |
+| **Window borders** | 1px pixel borders | Borderless (`default_border none`) |
 | **Gaps** | Inner 14, outer −2 | Inner 10, outer 3 |
 | **Workspaces** | 8 | 10 |
 | **Audio** | `volumeicon` tray app + alsamixer binding | Pure `pactl` via media keys |
@@ -225,7 +250,7 @@ The default Manjaro i3 community edition comes with a heavily modified config. H
 | **Power menu** | `i3exit` mode (lock/suspend/hibernate/reboot/shutdown) | Direct binds: `Super+Shift+I` lock, `Super+Shift+P` poweroff, `Super+Shift+O` reboot |
 | **Autorandr** | Not present | `exec_always autorandr --change` |
 | **Compositor** | Started alongside nitrogen | `exec --no-startup-id picom` (separate) |
-| **Bar** | `exec_always polybar example` | Kill-and-restart pattern to avoid duplicate bars |
+| **Bar** | `exec_always polybar example` | `launch.sh` detects active monitors, starts correct bar(s) |
 | **Floating rules** | Extensive list (Nitrogen, Pavucontrol, GParted, etc.) | Removed (handled by window class as needed) |
 | **Gap mode** | `Super+Shift+G` interactive gap adjustment | Removed |
 | **Back-and-forth** | `workspace_auto_back_and_forth yes` | Removed |
@@ -244,8 +269,11 @@ Install these on a fresh Manjaro/Arch system before running `install.sh`:
 sudo pacman -S i3-wm polybar kitty rofi picom dunst \
     nitrogen autorandr flameshot ranger btop cava neofetch \
     networkmanager network-manager-applet \
-    i3lock xss-lock dex \
+    i3lock xss-lock dex bluez bluez-utils \
     zsh curl git
+
+# Bluetooth GUI (AUR)
+yay -S overskride-bin
 ```
 
 Git LFS (for binary assets in any repos):
