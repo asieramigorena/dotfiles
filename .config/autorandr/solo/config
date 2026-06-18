@@ -19,7 +19,7 @@ x-prop-non_desktop 0
 x-prop-scaling_mode Full aspect
 output DP-1
 crtc 1
-mode 1920x1080
+mode 2560x1440
 pos 1920x0
 rate 60.00
 x-prop-audio auto

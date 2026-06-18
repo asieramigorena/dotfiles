@@ -1,0 +1,21 @@
+#!/bin/bash
+# Global autorandr postswitch hook — runs after every profile switch.
+# Called both by i3 (as user) and by udev (as root).
+
+export DISPLAY=:0
+export XAUTHORITY=/home/asi/.Xauthority
+
+# When triggered by udev autorandr runs as root; delegate back to the user.
+if [ "$(id -u)" = "0" ]; then
+    sudo -u asi DISPLAY=:0 XAUTHORITY=/home/asi/.Xauthority "$0" "$@"
+    exit $?
+fi
+
+# Give the display a moment to settle after the mode switch.
+sleep 0.5
+
+# Reload wallpaper on all active outputs.
+nitrogen --restore &
+
+# Restart polybar with the correct bar(s) for the new profile.
+~/.config/polybar/launch.sh

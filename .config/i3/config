@@ -37,6 +37,9 @@ exec --no-startup-id nm-applet
 
 exec --no-startup-id nitrogen --restore &
 
+# Display profile switcher: Super+P → rofi menu to pick autorandr profile
+bindsym $mod+p exec --no-startup-id autorandr --list | rofi -dmenu -p "Display" | xargs -I{} autorandr --load {}
+
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
@@ -204,10 +207,10 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# Matar polybar existente y lanzar nueva instancia
-exec_always --no-startup-id killall -q polybar; while pgrep -x polybar >/dev/null; do sleep 1; done; polybar &
+exec_always --no-startup-id ~/.config/polybar/launch.sh
 
 for_window [class=".*"] border pixel 0
+for_window [class="float-terminal"] floating enable, resize set 800 500, move position center
 
 gaps inner 10
 gaps outer 3
