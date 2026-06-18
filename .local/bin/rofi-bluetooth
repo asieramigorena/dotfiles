@@ -49,7 +49,6 @@ build_menu() {
 
     echo "---"
     echo "󱇧  Abrir Overskride"
-    echo "   Abrir bluetui"
     echo "󰂰  Buscar nuevos dispositivos"
 }
 
@@ -70,7 +69,6 @@ case "$CHOICE" in
     *"Bluetooth: ON"*)  toggle_bt ;;
     *"Bluetooth: OFF"*) toggle_bt ;;
     *"Abrir Overskride"*) overskride & ;;
-    *"Abrir bluetui"*) kitty --class float-terminal -e bluetui & ;;
     *"Buscar nuevos"*) scan_and_reopen ;;
     *)
         mac=$(echo "$CHOICE" | grep -oP '(?<=::)[0-9A-F:]+')

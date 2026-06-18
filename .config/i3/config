@@ -210,7 +210,6 @@ bindsym $mod+r mode "resize"
 exec_always --no-startup-id ~/.config/polybar/launch.sh
 
 for_window [class=".*"] border pixel 0
-for_window [class="float-terminal"] floating enable, resize set 800 500, move position center
 
 gaps inner 10
 gaps outer 3
